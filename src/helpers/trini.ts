@@ -1,6 +1,6 @@
 import { isPalindrome } from "./text";
 
-const debug = false;
+const debug = true;
 const groupByTwo = (arr: any, key1: string, key2: string) =>
   arr.reduce((objectsByKeyValue: any, obj: any) => {
     const value1 = obj[key1];
@@ -436,6 +436,11 @@ const parseNodeLinks = (obj: any) => {
   return obj;
 };
 
+const findParentIdFromPreviousGroup = (nodes:any[],group:number) => {
+    let parent = nodes.find((item:any) => item.group === group);
+    return parent && parent.id ? parent.id : null;
+}
+
 const nodeTree = (
   arr: any,
   nodes?: any,
@@ -443,13 +448,18 @@ const nodeTree = (
   obj?: any,
   index?: number,
   nodeIndex?: number,
-  level?: number
+  level?: number,
+  parent?: number
 ): any => {
+
+    // TODO Parent calculations will work only at the first three levels.
+
   if (!level) level = 0;
   if (!index) index = 0;
   if (!nodeIndex) nodeIndex = 0;
   if (!nodes) nodes = [];
   if (!links) links = [];
+
 
   let trini: any = {};
 
@@ -472,9 +482,10 @@ const nodeTree = (
       val: trini,
       type: "trini",
       group: level,
+      parent: level === 0 ? null : findParentIdFromPreviousGroup(nodes,level-1)
     };
     tempNodes.push(n);
-    debug && console.log(`appending node ${n.id} ${n.name}`);
+    debug && console.log(`appending main node ${n.id} ${n.name}`);
   }
   const parentNodeIndex = nodeIndex;
   if (_arr[index]) {
@@ -482,12 +493,13 @@ const nodeTree = (
       if (_arr[index].length > 1) {
         const _suj = nodeTree(
           _arr[index],
-          null,
+          tempNodes,
           null,
           obj,
           index,
           nodeIndex + 1,
-          level + 1
+          level + 1,
+          parent
         );
         nodeIndex = Number(_suj.nodeIndex);
         //level = Number(_suj.level);
@@ -509,6 +521,7 @@ const nodeTree = (
           val: trini.suj,
           type: "suj",
           group: Number(`${level + 1}${parentNodeIndex}`),
+          parent: parentNodeIndex
         };
         tempNodes.push(o);
         debug && console.log(`appending node ${o.id} ${o.name}`);
@@ -532,12 +545,13 @@ const nodeTree = (
       if (_arr[index + 1] && _arr[index + 1].length > 1) {
         const _eto = nodeTree(
           _arr[index + 1],
-          null,
+          tempNodes,
           null,
           obj,
           index,
           nodeIndex + 1,
-          level + 1
+          level + 1,
+          parent
         );
         nodeIndex = Number(_eto.nodeIndex);
         //level = Number(_eto.level);
@@ -560,6 +574,7 @@ const nodeTree = (
           val: trini.eto,
           type: "eto",
           group: Number(`${level + 1}${parentNodeIndex}`),
+          parent:parentNodeIndex
         };
         debug && console.log(`appending node ${o.id} ${o.name}`);
         tempNodes.push(o);
@@ -581,12 +596,13 @@ const nodeTree = (
       if (_arr[index + 2] && _arr[index + 2].length > 1) {
         const _obj = nodeTree(
           _arr[index + 2],
-          null,
+          tempNodes,
           null,
           obj,
           index,
           nodeIndex + 1,
-          level + 1
+          level + 1,
+          parent
         );
         nodeIndex = Number(_obj.nodeIndex);
         //level = Number(_obj.level);
@@ -608,6 +624,7 @@ const nodeTree = (
           val: trini.obj,
           type: "obj",
           group: Number(`${level + 1}${parentNodeIndex}`),
+          parent:parentNodeIndex
         };
         debug && console.log(`appending node ${o.id} ${o.name}`);
         tempNodes.push(o);
@@ -638,9 +655,10 @@ const nodeTree = (
   index += 3;
   //index += 2;
   //index++;
+  
 
   if (index < _arr.length) {
-    return nodeTree(_arr, nodes, links, obj, index, nodeIndex, level);
+    return nodeTree(_arr, nodes, links, obj, index, nodeIndex, level,parent);
   }
 
   return {
@@ -651,6 +669,7 @@ const nodeTree = (
     index: index,
     nodeIndex: nodeIndex,
     level: level,
+    parent: parent
   };
 };
 
