@@ -385,7 +385,7 @@ const parseNodeLinks = (obj: any) => {
 
   for (let l = 0; l < levelsKeys.length; l++) {
     let levelGroup = levels[levelsKeys[l]];
-    console.log("levelGroup", levelGroup);
+    //console.log("levelGroup", levelGroup);
     for (let i = 0; i < levelGroup.length; i++) {
       let item = levelGroup[i];
       if (item.parent) {
