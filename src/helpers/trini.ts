@@ -1,6 +1,6 @@
 import { isPalindrome } from "./text";
 
-const debug = true;
+const debug = false;
 const groupByTwo = (arr: any, key1: string, key2: string) =>
   arr.reduce((objectsByKeyValue: any, obj: any) => {
     const value1 = obj[key1];
@@ -374,25 +374,9 @@ const flatTrini = (arr: any) => {
 };
 
 const parseNodeLinks = (obj: any) => {
-  // process obj.nodes && obj.links;
-
-  /*const groups = groupByTwo(obj.nodes,"group","");
-    let links = obj.links;
-
-    links.push({
-        source: 1,
-        target: 2
-    });
-
-   */
 
   let nodes = obj.nodes;
   let links = obj.links;
-  
-  /*const idKey = (item:any) => item.id;
-  const keys = Array.from(
-    nodes.reduce((acc:any, item:any) => acc.add(idKey(item)) || acc, new Set()).values()
-  );*/
 
   const uniqueNodes = nodes.reduce((acc:any, item:any) => {
     if (!acc.some((accItem:any) => accItem.id === item.id)) {
@@ -401,35 +385,24 @@ const parseNodeLinks = (obj: any) => {
     return acc;
   }, []);
 
-  const groups = groupByAttr(obj.nodes, "type");
-   const groupsKeys = Object.keys(groups);
-   console.log(groupsKeys);
-   /* for(let g=0; g<groupsKeys.length; g++) {
-        let group = groups[groupsKeys[g]];
-       for(let i=0; i<group.length; i++) {
-            let item = group[i];
-            let nextItem = group[i+1];
-             if(i<(group.length-1)) { 
-                links.push({
-                     source: item.id,
-                     target: nextItem.id
-                });
-              }
-       }
-    }*/
 
-       let group = groups["trini"];
-       for(let i=0; i<group.length; i++) {
-            let item = group[i];
-            let nextItem = group[i+1];
-             if(i<(group.length-1)) { 
-                links.push({
-                     source: item.id,
-                     target: nextItem.id
-                });
-              }
-       }
+  const levels = groupByAttr(obj.nodes, "group");
+  const levelsKeys = Object.keys(levels);
   
+    for(let l=0; l<levelsKeys.length; l++) {
+        let levelGroup = levels[levelsKeys[l]];
+        console.log("levelGroup",levelGroup);
+       for(let i=0; i<levelGroup.length; i++) {
+            let item = levelGroup[i];
+            if(item.parent) {
+                links.push({
+                    source: item.parent,
+                    target: item.id
+               });
+            }
+       }
+    }
+
   obj.nodes = uniqueNodes;
   obj.links = links;
 
@@ -452,14 +425,11 @@ const nodeTree = (
   parent?: number
 ): any => {
 
-    // TODO Parent calculations will work only at the first three levels.
-
   if (!level) level = 0;
   if (!index) index = 0;
   if (!nodeIndex) nodeIndex = 0;
   if (!nodes) nodes = [];
   if (!links) links = [];
-
 
   let trini: any = {};
 
