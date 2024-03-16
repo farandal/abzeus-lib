@@ -1,4 +1,4 @@
-import { ITriniGroup } from "./trini";
+import ITrinitarianGroup from "../interfaces/IABZeusTrinitarianGroup";
 
 export const forEachWord = (
   phrase: string,
@@ -18,7 +18,7 @@ export const isPalindrome = (word: string): boolean => {
   return word === reversed;
 };
 
-export const joinTrinitarianGroupKeys = (trinitarianObject: ITriniGroup): string => {
+export const joinTrinitarianGroupKeys = (trinitarianObject: ITrinitarianGroup): string => {
     return `${trinitarianObject.suj || ""}${trinitarianObject.eto || ""}${trinitarianObject.obj || ""}`;
 }
 

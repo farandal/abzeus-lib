@@ -1,3 +1,6 @@
+import Translator from "../classes/Translator";
+import IABZeusTranslatorConfig from "../interfaces/IABZeusTranslatorConfig";
+import { ITrinitarianGroup } from "../interfaces/IABZeusTrinitarianGroup";
 import { isPalindrome } from "./text";
 
 const debug = false;
@@ -166,13 +169,6 @@ export const splitIntoTrinitarianGroups = (input: string): string[] => {
   return trinitarianGroups;
 };
 
-export interface ITriniGroup {
-  suj: string[] | string;
-  eto: string[] | string;
-  obj: string[] | string;
-  p_idx: number;
-  c_idx: number;
-}
 /**
  * @description Given a trinitarianArray:string[] returns the formatted Trinitarian group
  * e.g: { suj: [ 'con', 'sci', 'ous' ], eto: [ 'ness' ], obj: undefined }
@@ -183,7 +179,7 @@ export const FormatTriniGroup = (
   arr: string[] | string,
   parentIndex: number,
   index?: number
-): ITriniGroup => {
+): ITrinitarianGroup => {
   //const debug = false;
   if (!index) index = 0;
 
@@ -257,11 +253,11 @@ export const FormatTriniGroup = (
 export const FormatTriniGroups = (
   arr: string[],
   index?: number
-): ITriniGroup[] => {
+): ITrinitarianGroup[] => {
   if (!index) index = 0;
 
   const _arr = !Array.isArray(arr) ? Array.from(arr) : arr;
-  const trinitarianGroups: ITriniGroup[] = [];
+  const trinitarianGroups: ITrinitarianGroup[] = [];
 
   //const debug = false;
 
@@ -278,7 +274,7 @@ export const FormatTriniGroups = (
       const palindromeContent = palindrome[0][0];
 
       if (palindromeIndex === 0) {
-        const res: ITriniGroup = {
+        const res: ITrinitarianGroup = {
           suj: _arr.slice(0, 3) as unknown as string[],
           eto: _arr.slice(3, 5) as unknown as string[],
           obj: _arr.slice(5) as unknown as string[],
@@ -374,34 +370,32 @@ const flatTrini = (arr: any) => {
 };
 
 const parseNodeLinks = (obj: any) => {
-
   let nodes = obj.nodes;
   let links = obj.links;
 
-  const uniqueNodes = nodes.reduce((acc:any, item:any) => {
-    if (!acc.some((accItem:any) => accItem.id === item.id)) {
+  const uniqueNodes = nodes.reduce((acc: any, item: any) => {
+    if (!acc.some((accItem: any) => accItem.id === item.id)) {
       acc.push(item);
     }
     return acc;
   }, []);
 
-
   const levels = groupByAttr(obj.nodes, "group");
   const levelsKeys = Object.keys(levels);
-  
-    for(let l=0; l<levelsKeys.length; l++) {
-        let levelGroup = levels[levelsKeys[l]];
-        console.log("levelGroup",levelGroup);
-       for(let i=0; i<levelGroup.length; i++) {
-            let item = levelGroup[i];
-            if(item.parent) {
-                links.push({
-                    source: item.parent,
-                    target: item.id
-               });
-            }
-       }
+
+  for (let l = 0; l < levelsKeys.length; l++) {
+    let levelGroup = levels[levelsKeys[l]];
+    console.log("levelGroup", levelGroup);
+    for (let i = 0; i < levelGroup.length; i++) {
+      let item = levelGroup[i];
+      if (item.parent) {
+        links.push({
+          source: item.parent,
+          target: item.id,
+        });
+      }
     }
+  }
 
   obj.nodes = uniqueNodes;
   obj.links = links;
@@ -409,12 +403,13 @@ const parseNodeLinks = (obj: any) => {
   return obj;
 };
 
-const findParentIdFromPreviousGroup = (nodes:any[],group:number) => {
-    let parent = nodes.find((item:any) => item.group === group);
-    return parent && parent.id ? parent.id : null;
-}
+const findParentIdFromPreviousGroup = (nodes: any[], group: number) => {
+  let parent = nodes.find((item: any) => item.group === group);
+  return parent && parent.id ? parent.id : null;
+};
 
 const nodeTree = (
+  config: IABZeusTranslatorConfig,
   arr: any,
   nodes?: any,
   links?: any,
@@ -422,9 +417,30 @@ const nodeTree = (
   index?: number,
   nodeIndex?: number,
   level?: number,
-  parent?: number
+  parent?: number,
+  type?: "eto" | "suj" | "obj" | "trini" | null
 ): any => {
+  const translator = new Translator();
 
+  const translate = (word: string) => {
+    const trinitarianGroups = FormatTriniGroups(
+      splitIntoTrinitarianGroups(word)
+    );
+    let output = "";
+    //console.log("translating groups",trinitarianGroups)
+    for (let i = 0; i < trinitarianGroups.length; i++) {
+      const translation = translator.trinitarian(trinitarianGroups[i], {
+        ...config,
+        ...{ inlineDetail: true },
+      });
+      output += translation;
+      //console.log("subtranslating w:",word," g:",trinitarianGroups[i]," output:",)
+    }
+
+    return output;
+  };
+
+  if (!type) type = null;
   if (!level) level = 0;
   if (!index) index = 0;
   if (!nodeIndex) nodeIndex = 0;
@@ -446,13 +462,23 @@ const nodeTree = (
 
   if (index === 0) {
     nodeIndex++;
+
+    /* console.log(config,typeof trini === "object"
+    ? trini.trini
+    : trini);*/
+
+    const name = flatTrini(trini.trini);
     const n = {
       id: nodeIndex,
-      name: flatTrini(trini.trini),
+      name: name,
       val: trini,
-      type: "trini",
+      type: type || "trini",
       group: level,
-      parent: level === 0 ? null : findParentIdFromPreviousGroup(nodes,level-1)
+      parent:
+        level === 0 ? null : findParentIdFromPreviousGroup(nodes, level - 1),
+      ...(type && (config.nestedTranslation || level > 0)
+        ? { translation: translate(name) }
+        : { translation: null }),
     };
     tempNodes.push(n);
     debug && console.log(`appending main node ${n.id} ${n.name}`);
@@ -462,6 +488,7 @@ const nodeTree = (
     if (typeof trini.suj !== "object") {
       if (_arr[index].length > 1) {
         const _suj = nodeTree(
+          config,
           _arr[index],
           tempNodes,
           null,
@@ -469,7 +496,8 @@ const nodeTree = (
           index,
           nodeIndex + 1,
           level + 1,
-          parent
+          parent,
+          "suj"
         );
         nodeIndex = Number(_suj.nodeIndex);
         //level = Number(_suj.level);
@@ -482,24 +510,29 @@ const nodeTree = (
         nodeIndex++;
         trini.suj = _arr[index];
 
+        const name =
+          typeof trini.suj === "object"
+            ? flatTrini(trini.suj.trini)
+            : flatTrini(trini.suj);
         const o = {
           id: nodeIndex,
-          name:
-            typeof trini.suj === "object"
-              ? flatTrini(trini.suj.trini)
-              : flatTrini(trini.suj),
+          name: name,
           val: trini.suj,
           type: "suj",
           group: Number(`${level + 1}${parentNodeIndex}`),
-          parent: parentNodeIndex
+          parent: parentNodeIndex,
+          ...(config.nestedTranslation
+            ? { translation: translate(name) }
+            : { translation: null }),
         };
         tempNodes.push(o);
         debug && console.log(`appending node ${o.id} ${o.name}`);
         tempNodes.push(o);
 
-        debug && console.log(
-          `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
-        );
+        debug &&
+          console.log(
+            `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
+          );
 
         tempLinks.push({
           source: parentNodeIndex,
@@ -514,6 +547,7 @@ const nodeTree = (
     if (typeof trini.eto !== "object") {
       if (_arr[index + 1] && _arr[index + 1].length > 1) {
         const _eto = nodeTree(
+          config,
           _arr[index + 1],
           tempNodes,
           null,
@@ -521,7 +555,8 @@ const nodeTree = (
           index,
           nodeIndex + 1,
           level + 1,
-          parent
+          parent,
+          "eto"
         );
         nodeIndex = Number(_eto.nodeIndex);
         //level = Number(_eto.level);
@@ -533,25 +568,32 @@ const nodeTree = (
       } else {
         nodeIndex++;
         trini.eto = _arr[index + 1];
-
+        const translator = new Translator();
         //console.log(trini.eto)
+        const name =
+          typeof trini.eto === "object"
+            ? flatTrini(trini.eto.trini)
+            : flatTrini(trini.eto);
+
         const o = {
           id: nodeIndex,
-          name:
-            typeof trini.eto === "object"
-              ? flatTrini(trini.eto.trini)
-              : flatTrini(trini.eto),
+          name: name,
           val: trini.eto,
           type: "eto",
           group: Number(`${level + 1}${parentNodeIndex}`),
-          parent:parentNodeIndex
+          parent: parentNodeIndex,
+          ...(config.nestedTranslation
+            ? { translation: translate(name) }
+            : { translation: null }),
         };
+
         debug && console.log(`appending node ${o.id} ${o.name}`);
         tempNodes.push(o);
 
-        debug && console.log(
-          `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
-        );
+        debug &&
+          console.log(
+            `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
+          );
         tempLinks.push({
           source: parentNodeIndex,
           target: nodeIndex,
@@ -565,6 +607,7 @@ const nodeTree = (
     if (typeof trini.obj !== "object") {
       if (_arr[index + 2] && _arr[index + 2].length > 1) {
         const _obj = nodeTree(
+          config,
           _arr[index + 2],
           tempNodes,
           null,
@@ -572,43 +615,42 @@ const nodeTree = (
           index,
           nodeIndex + 1,
           level + 1,
-          parent
+          parent,
+          "obj"
         );
         nodeIndex = Number(_obj.nodeIndex);
-        //level = Number(_obj.level);
         trini.obj = _obj.obj;
-        //console.log("_obj", _arr[index + 2], trini.obj);
         tempNodes = [...tempNodes, ..._obj.nodes];
         tempLinks = [...tempLinks, ..._obj.links];
-        //console.log("_obj.nodes",_obj.nodes);
       } else {
         nodeIndex++;
         trini.obj = _arr[index + 2];
-
+        const name =
+          typeof trini.obj === "object"
+            ? flatTrini(trini.obj.trini)
+            : flatTrini(trini.obj);
         const o = {
           id: nodeIndex,
-          name:
-            typeof trini.obj === "object"
-              ? flatTrini(trini.obj.trini)
-              : flatTrini(trini.obj),
+          name: name,
           val: trini.obj,
           type: "obj",
           group: Number(`${level + 1}${parentNodeIndex}`),
-          parent:parentNodeIndex
+          parent: parentNodeIndex,
+          ...(config.nestedTranslation
+            ? { translation: translate(name) }
+            : { translation: null }),
         };
         debug && console.log(`appending node ${o.id} ${o.name}`);
         tempNodes.push(o);
-
-        debug && console.log(
-          `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
-        );
-
+        debug &&
+          console.log(
+            `linking ${parentNodeIndex} ${trini.trini} with ${nodeIndex} : ${o.name}`
+          );
         tempLinks.push({
           source: parentNodeIndex,
           target: nodeIndex,
         });
       }
-      //nodeIndex++;
     }
   }
 
@@ -623,12 +665,19 @@ const nodeTree = (
   }
 
   index += 3;
-  //index += 2;
-  //index++;
-  
 
   if (index < _arr.length) {
-    return nodeTree(_arr, nodes, links, obj, index, nodeIndex, level,parent);
+    return nodeTree(
+      config,
+      _arr,
+      nodes,
+      links,
+      obj,
+      index,
+      nodeIndex,
+      level,
+      parent
+    );
   }
 
   return {
@@ -639,114 +688,9 @@ const nodeTree = (
     index: index,
     nodeIndex: nodeIndex,
     level: level,
-    parent: parent
+    parent: parent,
   };
 };
-
-/*
-const nodeTree = (payload: {
-  arr: any;
-  nodes?: any[];
-  obj?: any;
-  index?: number;
-  nodeIndex?: number;
-}): any => {
-  if (!payload.index) payload.index = 0;
-  if (!payload.nodeIndex) payload.nodeIndex = 0;
-  if (!payload.nodes) payload.nodes = [];
-
-  let trini: any = {};
-
-  let _arr = !Array.isArray(payload.arr)
-    ? Array.from(payload.arr)
-    : payload.arr;
-
-  while (_arr.length === 1) {
-    _arr = _arr[0];
-  }
-
-  trini.trini = _arr;
-
-  const tempNodes = [];
-
-  tempNodes.push({
-    id: payload.nodeIndex,
-    name: flatTrini(trini.trini),
-    val: null,
-  });
-
-  payload.nodeIndex++;
-
-  if (_arr[payload.index])
-    trini.suj =
-      _arr[payload.index].length > 1
-        ? nodeTree({ arr: _arr[payload.index] })
-        : _arr[payload.index];
-  console.log("suj", trini.suj);
-  tempNodes.push({
-    id: payload.nodeIndex,
-    name: flatTrini(trini.suj),
-    val: null,
-  });
-  payload.nodeIndex++;
-
-  if (_arr[payload.index + 1])
-    trini.eto =
-      _arr[payload.index + 1].length > 1
-        ? nodeTree({ arr: _arr[payload.index + 1] })
-        : _arr[payload.index + 1];
-
-  tempNodes.push({
-    id: payload.nodeIndex,
-    name: flatTrini(trini.eto),
-    val: null,
-  });
-  payload.nodeIndex++;
-
-  if (_arr[payload.index + 2])
-    trini.obj =
-      _arr[payload.index + 2].length > 1
-        ? nodeTree({ arr: _arr[payload.index + 2] })
-        : _arr[payload.index + 2];
-
-  tempNodes.push({
-    id: payload.nodeIndex,
-    name: flatTrini(trini.obj),
-    val: null,
-  });
-  payload.nodeIndex++;
-
-  if (!payload.obj) {
-    payload.obj = trini;
-  } else if (
-    payload.obj &&
-    payload.obj.value &&
-    payload.obj.value !== trini.value
-  ) {
-    payload.obj = { ...payload.obj, trini };
-  }
-
-  if (payload.nodes) {
-    payload.nodes = [...payload.nodes, ...tempNodes];
-  }
-
-  payload.index += 2;
-
-  if (payload.index < _arr.length) {
-    return nodeTree({
-      arr: _arr,
-      nodes: payload.nodes,
-      obj: payload.obj,
-      index: payload.index,
-      nodeIndex: payload.nodeIndex,
-    });
-  } else {
-    debug && console.log("NODES", payload.nodes);
-
-    return payload.nodes;
-  }
-};
-*/
 
 const group = (arr: any[]): any => {
   const result = [];

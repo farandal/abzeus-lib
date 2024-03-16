@@ -1,3 +1,4 @@
+
 import createABZeusDict from "../dict/createABZeusDict";
 import {
   forEachWord,
@@ -7,7 +8,6 @@ import {
 import {
   FormatTriniGroup,
   FormatTriniGroups,
-  ITriniGroup,
   format,
   group,
   splitIntoTrinitarianGroups,
@@ -15,33 +15,15 @@ import {
   nodeTree,
   parseNodeLinks
 } from "../helpers/trini";
+
+import IABZeusTranslatorConfig from "../interfaces/IABZeusTranslatorConfig";
+import IABZeusTranslatorOutput from "../interfaces/IABZeusTranslatorOutput";
+import IABZeusTrinitarianGroup from "../interfaces/IABZeusTrinitarianGroup";
+import ITrinitarianGroup from "../interfaces/IABZeusTrinitarianGroup";
+
 import Dict from "./Dict";
 
 export type TrinitarianGroups = string[];
-
-export interface ITrinitarianObject {
-  eto?: string;
-  suj?: string;
-  obj?: string;
-}
-
-export interface IABZeusTranslatorConfig {
-  lang: string;
-  parentTriniFormat?: string;
-  childTriniFormat?: string;
-  inlineDetail?: boolean;
-  lineBreak?: boolean;
-}
-
-export interface IABZeusTranslatorOutput {
-  trinitarianGroups: ITriniGroup;
-  detailedOutput: string;
-  simpleOutput: string;
-  word: string;
-  splittedWord: string[];
-  triniTree: any;
-  nodeTree: any;
-}
 
 const DEFAULT_PARENT_TRINI_FORMAT = "+<>";
 const DEFAULT_CHILD_TRINI_FORMAT = "+><";
@@ -64,7 +46,7 @@ class Translator {
     return undefined;
   }
 
-  private defaultConfig = {
+  public DEFAULT_TRANSLATOR_CONFIG = {
     lang: "es",
     parentTriniFormat: DEFAULT_PARENT_TRINI_FORMAT,
     childTriniFormat: DEFAULT_CHILD_TRINI_FORMAT,
@@ -84,15 +66,19 @@ class Translator {
       //console.log("trinitarianGroups",trinitarianGroups);
 
       const triniTree = format(group(trini(splittedWord)));
-      const nodeTreeOutoput = parseNodeLinks(nodeTree(trini(splittedWord)));
+     
+      const nodeTreeOutoput = parseNodeLinks(nodeTree({
+        ...this.DEFAULT_TRANSLATOR_CONFIG,
+        ...config,
+      },trini(splittedWord)));
 
       const detailedOutput = this.trinitarian(trinitarianGroups, {
-        ...this.defaultConfig,
+        ...this.DEFAULT_TRANSLATOR_CONFIG,
         ...config,
       });
 
       const simpleOutput = this.trinitarian(trinitarianGroups, {
-        ...this.defaultConfig,
+        ...this.DEFAULT_TRANSLATOR_CONFIG,
         ...config,
         ...{ inlineDetail: false },
       });
@@ -118,13 +104,14 @@ class Translator {
     l: string,
     format: string, // <+>
     d?: boolean,
-    lineBreak?: boolean
+    lineBreak?: boolean,
+    nestedTranslation?: boolean
   ) {
     const debug = false;
     let output = "";
     const dict = Dict.getInstance();
     const formatArray = Array.from(format);
-    /*const trinitarianObject: ITriniGroup = {
+    /*const trinitarianObject: ITrinitarianGroup = {
       suj: trinitarianString[0],
       eto: trinitarianString[1],
       obj: trinitarianString[2],
@@ -133,7 +120,8 @@ class Translator {
     const trinitarianObject = FormatTriniGroup(trinitarianString, i, 0);
     //console.log(trinitarianString,"=>",trinitarianObject)
 
-    const _translate = (tri: ITriniGroup, i: number) => {
+    // TODO process as a palindrome, if there are two consecutive letters
+    const _translate = (tri: ITrinitarianGroup, i: number) => {
       debug && console.log("TRA", i, tri);
       // is the entire TriniGroup a palindrome?
       if (
@@ -233,7 +221,7 @@ class Translator {
             }
           }
         }
-        output += "";
+        output += " ";
       }
     };
 
@@ -244,7 +232,7 @@ class Translator {
     }`;
   }
 
-  public trinitarian(tri: ITriniGroup, config: IABZeusTranslatorConfig) {
+  public trinitarian(tri: ITrinitarianGroup, config: IABZeusTranslatorConfig) {
     //console.log("trinitarian()",tri);
     const parentTriniFormat =
       config.parentTriniFormat || DEFAULT_PARENT_TRINI_FORMAT;
@@ -268,7 +256,8 @@ class Translator {
           config.lang,
           childTriniFormat,
           config.inlineDetail,
-          config.lineBreak
+          config.lineBreak,
+          config.nestedTranslation
         );
       } else if (positionFormat === "<" && tri.suj) {
         //console.log("trisuj",tri.suj)
@@ -283,7 +272,8 @@ class Translator {
           config.lang,
           childTriniFormat,
           config.inlineDetail,
-          config.lineBreak
+          config.lineBreak,
+          config.nestedTranslation
         );
       } else if (positionFormat === ">" && tri.obj) {
         //console.log("triobj",tri.obj)
@@ -297,7 +287,8 @@ class Translator {
           config.lang,
           childTriniFormat,
           config.inlineDetail,
-          config.lineBreak
+          config.lineBreak,
+          config.nestedTranslation
         );
       }
       output += ` `;
@@ -307,3 +298,7 @@ class Translator {
 }
 
 export default Translator;
+
+export type { IABZeusTranslatorOutput as IABZeusTranslatorOutput };
+export type { IABZeusTranslatorConfig as IABZeusTranslatorConfig };
+export type { IABZeusTrinitarianGroup as IABZeusTrinitarianGroup };

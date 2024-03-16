@@ -1,4 +1,5 @@
-import Translator, { IABZeusTranslatorOutput } from "./classes/Translator";
+
+import Translator, {IABZeusTranslatorOutput} from "./classes/Translator";
 
 /* TRINITY FORMAT GLOSSARY:
     - ETO: +
