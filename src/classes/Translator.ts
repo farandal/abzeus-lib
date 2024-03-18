@@ -19,7 +19,6 @@ import {
 import IABZeusTranslatorConfig from "../interfaces/IABZeusTranslatorConfig";
 import IABZeusTranslatorOutput from "../interfaces/IABZeusTranslatorOutput";
 import IABZeusTrinitarianGroup from "../interfaces/IABZeusTrinitarianGroup";
-import ITrinitarianGroup from "../interfaces/IABZeusTrinitarianGroup";
 
 import Dict from "./Dict";
 
@@ -111,7 +110,7 @@ class Translator {
     let output = "";
     const dict = Dict.getInstance();
     const formatArray = Array.from(format);
-    /*const trinitarianObject: ITrinitarianGroup = {
+    /*const trinitarianObject: IABZeusTrinitarianGroup = {
       suj: trinitarianString[0],
       eto: trinitarianString[1],
       obj: trinitarianString[2],
@@ -121,7 +120,7 @@ class Translator {
     //console.log(trinitarianString,"=>",trinitarianObject)
 
     // TODO process as a palindrome, if there are two consecutive letters
-    const _translate = (tri: ITrinitarianGroup, i: number) => {
+    const _translate = (tri: IABZeusTrinitarianGroup, i: number) => {
       debug && console.log("TRA", i, tri);
       // is the entire TriniGroup a palindrome?
       if (
@@ -232,8 +231,10 @@ class Translator {
     }`;
   }
 
-  public trinitarian(tri: ITrinitarianGroup, config: IABZeusTranslatorConfig) {
+  public trinitarian(tri: IABZeusTrinitarianGroup, config: IABZeusTranslatorConfig) {
     //console.log("trinitarian()",tri);
+
+    if(!config.lang) config.lang = "es";
     const parentTriniFormat =
       config.parentTriniFormat || DEFAULT_PARENT_TRINI_FORMAT;
     const parentTriniFormatArray = Array.from(parentTriniFormat);

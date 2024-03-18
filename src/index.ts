@@ -1,5 +1,5 @@
 
-import Translator, {IABZeusTranslatorOutput} from "./classes/Translator";
+import Translator, {IABZeusTranslatorConfig, IABZeusTranslatorOutput, IABZeusTrinitarianGroup} from "./classes/Translator";
 
 /* TRINITY FORMAT GLOSSARY:
     - ETO: +
@@ -15,3 +15,5 @@ export {
 };
 
 export type { IABZeusTranslatorOutput as IABZeusTranslatorOutput };
+export type { IABZeusTranslatorConfig as IABZeusTranslatorConfig };
+export type { IABZeusTrinitarianGroup as IABZeusTrinitarianGroup }
