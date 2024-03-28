@@ -1,5 +1,5 @@
 
-import createABZeusDict from "../dict/createABZeusDict";
+import ABZeusDict from "../dict/ABZeusDict";
 import format, { format2 } from "../helpers/functions/format";
 import { FormatTriniGroups, FormatTriniGroup } from "../helpers/functions/formatTriniGroup";
 import { group } from "../helpers/functions/misc";
@@ -30,7 +30,7 @@ class Translator {
   private _dict;
   constructor() {
     // Initializes the -O-Z*us Alfwet dictionary.
-    this._dict = createABZeusDict();
+    this._dict = ABZeusDict();
   }
 
   public c(c: string, l: string): string | undefined {

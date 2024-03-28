@@ -1,6 +1,6 @@
 import Dict from "../classes/Dict";
 
-const createABZeusDict = ():Dict => {
+const ABZeusDict = ():Dict => {
   const dictionary = Dict.getInstance();
   
   dictionary.l("es");
@@ -257,4 +257,4 @@ const createABZeusDict = ():Dict => {
 
 };
 
-export default createABZeusDict;
+export default ABZeusDict;

@@ -1,5 +1,6 @@
 
 import Translator, {IABZeusTranslatorConfig, IABZeusTranslatorOutput, IABZeusTrinitarianGroup} from "./classes/Translator";
+import ABZeusDict from "./dict/ABZeusDict";
 
 /* TRINITY FORMAT GLOSSARY:
     - ETO: +
@@ -11,7 +12,8 @@ const translator = new Translator(); // Initializes the Translator Class instanc
 translator.translate("filosofía dualidad trinidad dios religión",{lang:"es"});
 */
 export {
-    Translator as ABZeusAlfwetTranslator
+    Translator as ABZeusAlfwetTranslator,
+    ABZeusDict
 };
 
 export type { IABZeusTranslatorOutput as IABZeusTranslatorOutput };
