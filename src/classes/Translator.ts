@@ -1,20 +1,18 @@
 
 import createABZeusDict from "../dict/createABZeusDict";
+import format, { format2 } from "../helpers/functions/format";
+import { FormatTriniGroups, FormatTriniGroup } from "../helpers/functions/formatTriniGroup";
+import { group } from "../helpers/functions/misc";
+import { splitIntoTrinitarianGroups } from "../helpers/functions/splitIntoTrinitarianGroups";
+import { parseNodeLinks, nodeTree } from "../helpers/node";
 import {
   forEachWord,
+  forEachLetter,
   isPalindrome,
   joinTrinitarianGroupKeys,
 } from "../helpers/text";
-import {
-  FormatTriniGroup,
-  FormatTriniGroups,
-  format,
-  group,
-  splitIntoTrinitarianGroups,
-  trini,
-  nodeTree,
-  parseNodeLinks
-} from "../helpers/trini";
+
+import trini from "../helpers/trini";
 
 import IABZeusTranslatorConfig from "../interfaces/IABZeusTranslatorConfig";
 import IABZeusTranslatorOutput from "../interfaces/IABZeusTranslatorOutput";
@@ -28,9 +26,11 @@ const DEFAULT_PARENT_TRINI_FORMAT = "+<>";
 const DEFAULT_CHILD_TRINI_FORMAT = "+><";
 
 class Translator {
+
+  private _dict;
   constructor() {
     // Initializes the -O-Z*us Alfwet dictionary.
-    createABZeusDict();
+    this._dict = createABZeusDict();
   }
 
   public c(c: string, l: string): string | undefined {
@@ -53,44 +53,67 @@ class Translator {
     lineBreak: false,
   };
 
+  
+  public unicodeTranslate(word:string) {
+    
+  }
+
   public translate(
     phrase: string,
     config?: Partial<IABZeusTranslatorConfig>
   ): IABZeusTranslatorOutput[] {
+
+
+    const _config =  {...this.DEFAULT_TRANSLATOR_CONFIG,
+        ...config}
+
+    
+    const d = this._dict.alfwet(_config.lang);
+
     const output: IABZeusTranslatorOutput[] = [];
+
+
     forEachWord(phrase, (word: string, index: number) => {
+      
       const splittedWord = splitIntoTrinitarianGroups(word);
       //console.log("splittedWord",splittedWord);
-      const trinitarianGroups = FormatTriniGroups(splittedWord, index)[0];
-      //console.log("trinitarianGroups",trinitarianGroups);
+      const trinitarianGroups = FormatTriniGroups(splittedWord, index)[0]; // TODO: this should not be 0.
+      //console.log("trinitarianGroups",FormatTriniGroups(splittedWord, index));
+      
+      //console.log("XXX",group(trini(splittedWord)));
+      //console.log("ROOT FORMATTER ",FormatTriniGroups(splittedWord, 0));
+      const triniTree = format2(FormatTriniGroups(splittedWord, 0));
+      console.log("TRINI TREE", JSON.stringify(triniTree))
+      //console.log("TRINI TREE",triniTree);
+      //console.log("trini splitted word",trini(splittedWord));
+      
+      const nodeTreeOutoput = parseNodeLinks(nodeTree(_config,trini(splittedWord)));
 
-      const triniTree = format(group(trini(splittedWord)));
-     
-      const nodeTreeOutoput = parseNodeLinks(nodeTree({
-        ...this.DEFAULT_TRANSLATOR_CONFIG,
-        ...config,
-      },trini(splittedWord)));
-
-      const detailedOutput = this.trinitarian(trinitarianGroups, {
-        ...this.DEFAULT_TRANSLATOR_CONFIG,
-        ...config,
-      });
+      const detailedOutput = this.trinitarian(trinitarianGroups, _config);
 
       const simpleOutput = this.trinitarian(trinitarianGroups, {
-        ...this.DEFAULT_TRANSLATOR_CONFIG,
-        ...config,
+        ..._config,
         ...{ inlineDetail: false },
       });
 
-      const result = {
+      // TODO: move this to the dict class
+      let unicodeTranslatedCharacters = "";
+      forEachLetter(word, (letter: string, index: number) => {
+        console.log("forEachLetter",splittedWord,letter)
+        unicodeTranslatedCharacters += this._dict.getEntry(letter,_config.lang).char;
+      });
+  
+      const result:IABZeusTranslatorOutput = {
         trinitarianGroups: trinitarianGroups,
         word: word,
+        charTranslatedWord: unicodeTranslatedCharacters, 
         splittedWord: splittedWord,
         detailedOutput: `(${word}).* ${detailedOutput}`,
         simpleOutput: `(${word}).* ${simpleOutput}`,
         triniTree: triniTree,
         nodeTree: nodeTreeOutoput,
       };
+  
 
       output.push(result);
     });
@@ -121,6 +144,7 @@ class Translator {
 
     // TODO process as a palindrome, if there are two consecutive letters
     const _translate = (tri: IABZeusTrinitarianGroup, i: number) => {
+
       debug && console.log("TRA", i, tri);
       // is the entire TriniGroup a palindrome?
       if (
@@ -292,8 +316,10 @@ class Translator {
           config.nestedTranslation
         );
       }
+  
       output += ` `;
     }
+    
     return output;
   }
 }

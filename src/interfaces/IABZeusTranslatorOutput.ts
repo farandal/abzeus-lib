@@ -8,6 +8,7 @@ interface IABZeusTranslatorOutput {
     splittedWord: string[];
     triniTree: any;
     nodeTree: any;
+    charTranslatedWord?: string;
   }
   
 export default IABZeusTranslatorOutput

@@ -1,7 +1,8 @@
 import Dict from "../classes/Dict";
 
-const createABZeusDict = () => {
+const createABZeusDict = ():Dict => {
   const dictionary = Dict.getInstance();
+  
   dictionary.l("es");
 
   dictionary.c("eto|+><", "es", "");
@@ -167,6 +168,92 @@ const createABZeusDict = () => {
   dictionary.c("Ó", "en", "a projection of a definition");
   dictionary.c("Ú", "en", "a rational projection");
   dictionary.c("Ñ", "en", "an oscillating set of information");
+
+  dictionary.l("gk");
+
+  dictionary.c("eto|+><", "gk", "");
+  dictionary.c("suj|+><", "gk", "from ");
+  dictionary.c("obj|+><", "gk", "towards ");
+  dictionary.c("*.*|+><", "gk", "contained in ");
+
+  dictionary.c("eto|+<>", "gk", "");
+  dictionary.c("suj|+<>", "gk", "that is from ");
+  dictionary.c("obj|+<>", "gk", "to ");
+  dictionary.c("*.*|+<>", "gk", "what is contained in ");
+
+  dictionary.c("eto|<+>", "gk", "is ");
+  dictionary.c("suj|<+>", "gk", "from ");
+  dictionary.c("obj|<+>", "gk", "towards ");
+  dictionary.c("*.*|<+>", "gk", "what is contained in ");
+
+  dictionary.c("a", "gk", "origin [ά] of a direction [λ] that projects the initial definition [ά] to what is within or between a projected description [Φ]","α");
+  dictionary.c("b", "gk", "initial definition [α] that projects a singular set [ή] contained in the conclusion [β]","β");
+  dictionary.c("c", "gk", "describes [i] here (chi) [x] as what is describable between limits [Ξ]","ξ");
+  dictionary.c("d", "gk", "origin or initial definition [α] from what exists [τ] that projects a description between describable limits [έ] towards the plurality of information as a distance from the end towards the origin [λ] from a defined portion of information [δ]","δ");
+  dictionary.c("e", "gk", "defines [o] the spread of information [λ] towards a portion of information [ν] that rationally describes [ψ] an integral description [ι] from what is representable (describable between limits) (έψι’λον).* ","ε");
+  dictionary.c("f", "gk", "describable [i] within the defined [o] [φ]","φ");
+  dictionary.c("g", "gk", "self contained describable rationalization of information [μ] within the origin or initial definition [α] from the spread of information [γ]","γ");
+  dictionary.c("h", "gk", "projects a model or singular describable set [ή] towards an initial definition [α] of what exists [t]","η");
+  dictionary.c("i", "gk", "origin or initial definition [α] from the projection of everything [ώ] that describes [I] what exists [+] (ιώτ’α) ","ι");
+  dictionary.c("j", "gk", "a link","ι");
+  dictionary.c("k", "gk", "self contained border, edge [π] contained within an origin or initial definition [a] from the divergence of information [k] (Κ’άππα).* ","κ");
+  dictionary.c("l", "gk", "portion of defined information [δ] that concludes [β] its origin [α] as the projected origin [ά] of a direction [λ] (that projects the origin [ά] to what is within or between a description and a projection [λ]) towards a descriptable rationalization [μ] (λάμ’βδα).*","λ");
+  dictionary.c("m", "gk", "rationalization from the plurality","μ");
+  dictionary.c("n", "gk", "rationalization from a singular set or portion","ν");
+  dictionary.c("o", "gk", "radius [ρ] that defines [o] the divergence of information [κ] towards a portion of information [v] that rationalizes [μ] a description [ι] from a projected definition [ό] (όμι’κρο’ν).*","ο");
+  dictionary.c("p", "gk", "defines a description of what exists from the 'border' or 'edge' of the conclusion [ π ] describing the portion of information [ v ] or the information between describable limits [II]","π");
+  dictionary.c("q", "gk", "origin or initial definition that projects a singular model or set towards what exists from the link/vector within or towards what is defined [θ] (θήτα).* ","Θ");
+  dictionary.c("r", "gk", "everything [w] from the radius [ρ] (ρώ)","ρ");
+  dictionary.c("s", "gk", "an initial definition or origin from a descriptable rationalization [μα] that projects a description [ί] of the 'spread' of information [γ] from what is projectable within limits [Σ] (σίγ’μα)","ς");
+  dictionary.c("t", "gk", "origin or initial definition [ά] that rationalizes [u] what exists [t] (ταυ)","τ");
+  dictionary.c("u", "gk", "defines [o] a direction [λ] towards a portion of information [v] that rationally describes [ψ] an integral description [ι] from a projected rationalization [ύ] (ύψι’λον)","υ");
+  dictionary.c("v", "gk", "a portion","ν"); // Not in greek originally
+  dictionary.c("w", "gk", "origin or initial definition [a] from the spread of information towards the origin [γ] that descriptable rationalizes [μ] everything [ω, a+b] towards a projection of what is describable between limits [έ] (ωμέ’γα)","ω");
+  dictionary.c("x", "gk", "here","χ");
+  dictionary.c("y", "gk", "describes [i] what is rationally descriptable [ψ]","ψ");
+  dictionary.c("z", "gk", "origin or initial definition that projects the describable singular set or model as a magnitude limit towards what exists (ζήτ’α)","ζ");
+
+  dictionary.c("á", "gk", "a projection of an origin","ά");
+  dictionary.c("é", "gk", "a projection of a representation","έ");
+  dictionary.c("í", "gk", "a projection of a description","ί");
+  dictionary.c("ó", "gk", "a projection of a definition","ό");
+  dictionary.c("ú", "gk", "a rational projection","ύ");
+
+  dictionary.c("A", "gk", "origin [ά] of a direction [λ] that projects the initial definition [ά] to what is within or between a projected description [Φ].","Α");
+  dictionary.c("B", "gk", "initial definition [α] that projects a singular set [ή] contained in the conclusion [β]","Β");
+  dictionary.c("C", "gk", "Describes [i] here (chi) [x] as what is describable between limits [Ξ]","Ξ");
+  dictionary.c("D", "gk", "Origin or initial definition [α] from what exists [τ] that projects a description between describable limits [έ] towards the plurality of information as a distance from the end towards the origin [λ] from a defined portion of information [δ]","Δ");
+  dictionary.c("E", "gk", "defines [o] the spread of information [λ] towards a portion of information [ν] that rationally describes [ψ] an integral description [ι] from what is representable (describable between limits) [έ]","Ε");
+  dictionary.c("F", "gk", "describable [i] within the defined [o] [φ]","Φ");
+  dictionary.c("G", "gk", "self contained describable rationalization of information [μ] within the origin or initial definition [α] from the spread of information [γ]","Γ");
+  dictionary.c("H", "gk", "projects a model or singular describable set [ή] towards an initial definition [α] of what exists [t]","Η");
+  dictionary.c("I", "gk", "origin or initial definition [α] from the projection of everything [ώ] that describes [I] what exists [+] (ιώτ’α)","Ι");
+  dictionary.c("J", "gk", "a link","J");
+  dictionary.c("K", "gk", "self contained border, edge [π] contained within an origin or initial definition [a] from the divergence of information [k] (Κ’άππα)","Κ");
+  dictionary.c("L", "gk", "portion of defined information [δ] that concludes [β] its origin [α] as the projected origin [ά] of a direction [λ] (that projects the origin [ά] to what is within or between a description and a projection [λ]) towards a descriptable rationalization [μ] (λάμ’βδα)","Λ");
+  //dictionary.c("M", "gk", "(ύψιλον).* a defined portion of information from the spread [λoν] that rationally describes a descriptable rational projection [ύψι]","Μ");
+  dictionary.c("M", "gk", "rationalization from the plurality","Μ");
+  dictionary.c("N", "gk", "rationalization from a singular set or portion","Ν");
+  dictionary.c("O", "gk", "radius [ρ] that defines [o] the divergence of information [κ] towards a portion of information [v] that rationalizes [μ] a description [ι] from a projected definition [ό] (όμι’κρο’ν)","Ο");
+  dictionary.c("P", "gk", "defines a description of what exists from the 'border' or 'edge' of the conclusion [ π ] describing the portion of information [ v ] or the information between describable limits [II]","Π");
+  dictionary.c("Q", "gk", "origin or initial definition that projects a singular model or set towards what exists from the link/vector within or towards what is defined [θ] (θήτα)","Θ");
+  dictionary.c("R", "gk", "everything [w] from the radius [ρ] (ρώ)","Ρ");
+  dictionary.c("S", "gk", "an initial definition or origin from a descriptable rationalization [μα] that projects a description [ί] of the 'spread' of information [γ] from what is projectable within limits [Σ] (σίγ’μα)","Σ");
+  dictionary.c("T", "gk", "origin or initial definition [ά] that rationalizes [u] what exists [t] (ταυ)","Τ");
+  dictionary.c("U", "gk", "defines [o] a direction [λ] towards a portion of information [v] that rationally describes [ψ] an integral description [ι] a projected rationalization [ύ] (ύψι’λον)","Υ");
+  dictionary.c("V", "gk", "a portion","Ν"); // Not in greek originally
+  dictionary.c("W", "gk", "origin or initial definition [a] from the spread of information towards the origin [γ] that descriptable rationalizes [μ] everything [ω, a+b] towards a projection of what is describable between limits [έ] (ωμέ’γα)","Ω");
+  dictionary.c("X", "gk", "here","Χ");
+  dictionary.c("Y", "gk", "describes [i] what is rationally descriptable [ψ]","Ψ");
+  dictionary.c("Z", "gk", "origin or initial definition that projects the describable singular set or model as a magnitude limit towards what exists (ζήτ’α)","ζ");
+
+  dictionary.c("Á", "gk", "a projection of an origin [ά] as a direction [λ] that projects the initial definition [ά] to what is within or between a projected description [Φ].","Á");
+  dictionary.c("É", "gk", "a projection of a definition [o] of the spread direction [λ] towards a singular set or portion of information [ν] that rationally describes [ψ] an integral description [ι] from what is representable (describable between limits) [έ]","É");
+  dictionary.c("Í", "gk", "a projection of an origin or initial definition [α] from everything [ώ] that describes [I] what exists [+]","Í");
+  dictionary.c("Ó", "gk", "a projection of a radius [ρ] that defines [o] the divergence of information [κ] towards a portion of information [v] that rationalizes [μ] a description [ι] from a projected definition [ό]","Ó");
+  dictionary.c("Ú", "gk", "a projection of a definition [o] as a direction [λ] towards a portion of information [v] that rationally describes [ψ] an integral description [ι] from the projection of the rationalization [ύ]","Υ");
+
+  return dictionary;
 
 };
 
