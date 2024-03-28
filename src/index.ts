@@ -1,4 +1,5 @@
 
+import { IABZeusDictEntry } from "./classes/Dict";
 import Translator, {IABZeusTranslatorConfig, IABZeusTranslatorOutput, IABZeusTrinitarianGroup} from "./classes/Translator";
 import ABZeusDict from "./dict/ABZeusDict";
 
@@ -16,6 +17,7 @@ export {
     ABZeusDict
 };
 
-export type { IABZeusTranslatorOutput as IABZeusTranslatorOutput };
-export type { IABZeusTranslatorConfig as IABZeusTranslatorConfig };
+export type { IABZeusDictEntry as IABZeusDictEntry }
+export type { IABZeusTranslatorOutput as IABZeusTranslatorOutput }
+export type { IABZeusTranslatorConfig as IABZeusTranslatorConfig }
 export type { IABZeusTrinitarianGroup as IABZeusTrinitarianGroup }
