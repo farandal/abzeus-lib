@@ -30,7 +30,7 @@ export const nodeTree = (
         splitIntoTrinitarianGroups(word)
       );
       let output = "";
-      console.log("translating groups",trinitarianGroups)
+      //console.log("translating groups",trinitarianGroups)
       for (let i = 0; i < trinitarianGroups.length; i++) {
         const translation = translator.trinitarian(trinitarianGroups[i], {
           ...config,
@@ -53,11 +53,11 @@ export const nodeTree = (
     let trini: any = {};
   
     let _arr = !Array.isArray(arr) ? Array.from(arr) : arr;
-  
-    while (_arr.length === 1) {
+    
+    while (_arr.length === 1 && Array.isArray(_arr)) {
       _arr = _arr[0];
     }
-  
+
     trini.trini = _arr;
   
     let tempNodes: any[] = [];

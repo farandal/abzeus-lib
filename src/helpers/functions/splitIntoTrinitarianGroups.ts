@@ -20,10 +20,12 @@ export const splitIntoTrinitarianGroups = (input: string): string[] => {
     //debug && console.log("palindromes found", palindromes);
   
     //const modifiedInput = input.replace(/th/g, "t").replace(/ph/g, "f");
+    
     const modifiedInput = input;
     let reader = 0;
     let triCounter = 0;
     let triGroupHasOnePalindrome = false;
+
     while (reader < modifiedInput.length) {
       const currentLetter = modifiedInput[reader];
       const nextLetter = modifiedInput[reader + 1];
