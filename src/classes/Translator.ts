@@ -51,12 +51,11 @@ class Translator {
     childTriniFormat: DEFAULT_CHILD_TRINI_FORMAT,
     inlineDetail: true,
     lineBreak: false,
+    processTree: true
   };
 
-  
-  public unicodeTranslate(word:string) {
-    
-  }
+  /*public unicodeTranslate(word:string) {
+  }*/
 
   public translate(
     phrase: string,
@@ -66,7 +65,7 @@ class Translator {
     const _config =  {...this.DEFAULT_TRANSLATOR_CONFIG,
         ...config}
 
-    const d = this._dict.alfwet(_config.lang);
+    //const d = this._dict.alfwet(_config.lang);
 
     const output: IABZeusTranslatorOutput[] = [];
 
@@ -77,28 +76,34 @@ class Translator {
     // Use the replace() method to remove the connectors
     phrase = phrase.replace(regex, "");
 
-    let fullTriniTree:any[] = [];
-
-    forEachWord(phrase, (word: string, index: number) => {
-        const splittedWord = splitIntoTrinitarianGroups(word);
-        fullTriniTree.push(format2(FormatTriniGroups(splittedWord)));
-    });
+    if(_config.processTree) {
     
-    let fullTriniGroups:IABZeusTrinitarianGroup[] = [];
-    forEachWord(phrase, (word: string, index: number) => {
-        const splittedWord = splitIntoTrinitarianGroups(word);
-        fullTriniGroups.push(...FormatTriniGroups(splittedWord, index));
-    });
+        let fullTriniTree:any[] = [];
 
+        forEachWord(phrase, (word: string, index: number) => {
+            const splittedWord = splitIntoTrinitarianGroups(word);
+            fullTriniTree.push(format2(FormatTriniGroups(splittedWord)));
+        });
+        
+        let fullTriniGroups:IABZeusTrinitarianGroup[] = [];
+        forEachWord(phrase, (word: string, index: number) => {
+            const splittedWord = splitIntoTrinitarianGroups(word);
+            fullTriniGroups.push(...FormatTriniGroups(splittedWord, index));
+        });
+
+    }
     
-    console.log(fullTriniGroups,fullTriniTree);
+    //console.log(fullTriniGroups,fullTriniTree);
 
     forEachWord(phrase, (word: string, index: number) => {
         
       const splittedWord = splitIntoTrinitarianGroups(word);
       const trinitarianGroups = FormatTriniGroups(splittedWord, index)[0]; // TODO: this should not be 0.
-      const triniTree = format2(FormatTriniGroups(splittedWord));
-      const nodeTreeOutoput = parseNodeLinks(nodeTree(_config,trini(splittedWord)));
+      
+    
+
+      
+      
       const detailedOutput = this.trinitarian(trinitarianGroups, _config);
       const simpleOutput = this.trinitarian(trinitarianGroups, {
         ..._config,
@@ -117,8 +122,8 @@ class Translator {
         splittedWord: splittedWord,
         detailedOutput: `(${word}).* ${detailedOutput}`,
         simpleOutput: `(${word}).* ${simpleOutput}`,
-        triniTree: triniTree,
-        nodeTree: nodeTreeOutoput,
+        triniTree: _config.processTree ? format2(FormatTriniGroups(splittedWord)) : null,
+        nodeTree: _config.processTree ? parseNodeLinks(nodeTree(_config,trini(splittedWord))) : null,
       };
 
       output.push(result);

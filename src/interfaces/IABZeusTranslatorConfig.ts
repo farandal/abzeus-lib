@@ -5,6 +5,7 @@ interface IABZeusTranslatorConfig {
     inlineDetail?: boolean;
     lineBreak?: boolean;
     nestedTranslation?: boolean;
+    processTree?: boolean;
   }
 
 export default IABZeusTranslatorConfig
