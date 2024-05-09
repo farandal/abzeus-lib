@@ -85,89 +85,111 @@ export const FormatTriniGroup = (
       c_idx: index,
     };
   };
-  
-  export const FormatTriniGroups = (
-    arr: string[],
-    index?: number
-  ): ITrinitarianGroup[] => {
 
-    const debug = false;
-    
-    if (!index) index = 0;
-  
-    const _arr = !Array.isArray(arr) ? Array.from(arr) : arr;
-    const trinitarianGroups: ITrinitarianGroup[] = [];
-  
-    //const debug = false;
-  
-    if (_arr.length > 1) {
-  
-      const palindrome = findTrinitarianPalindromes(_arr.join(""));
-      
-      // More than one palindrome could exists is one word. e.g: 'ataraxia'; [ata] and [ara];
-      // Only the first found is considered in this algorithm, if found.
-      debug && console.log("PAL FOND ", palindrome);
-  
-      if (palindrome.length > 0) {
-        // TODO: Assumed only one palindrome by trinitarian group
-        const palindromeIndex = palindrome[0][1][0];
-        const palindromeContent = palindrome[0][0];
-  
-        if (palindromeIndex === 0) {
-          const res: ITrinitarianGroup = {
-            suj: _arr.slice(0, 3) as unknown as string[],
-            eto: _arr.slice(3, 5) as unknown as string[],
-            obj: _arr.slice(5) as unknown as string[],
-            p_idx: index,
-            c_idx: palindromeIndex,
-            word: _arr.join("")
-          };
-          debug && console.log("PAL IDX 0", arr, res);
-          trinitarianGroups.push(res);
-        } else if (palindromeIndex === 1) {
-          const res = {
-            suj: _arr.slice(0, 1) as unknown as string[],
-            eto: _arr.slice(1, 4) as unknown as string[],
-            obj: _arr.slice(4) as unknown as string[],
-            p_idx: index,
-            c_idx: palindromeIndex,
-            word: _arr.join("")
-          };
-          debug && console.log("PAL IDX 1", arr, res);
-          //console.log("FormatTriniGroup", arr, res);
-          trinitarianGroups.push(res);
-        } else if (palindromeIndex === 2) {
-          const res = {
-            suj: _arr.slice(0, 1) as unknown as string[],
-            eto: _arr.slice(1, 2) as unknown as string[],
-            obj: _arr.slice(2) as unknown as string[],
-            p_idx: index,
-            c_idx: palindromeIndex,
-            word: _arr.join("")
-          };
-
-          debug && console.log("PAL IDX 2", arr, res);
-          //console.log("FormatTriniGroup", arr, res);
-          trinitarianGroups.push(res);
+  const palindromeAtIndex = (palindromes:[string, number[]][],index:number):boolean => {
+     let response = false;
+     palindromes.forEach((p) => {
+        if(p[1][0] === index) {
+            response = true;
         }
-      }
+     })
+     return response;
+  }
+
+  const palindromeValueAtIndex = (palindromes:[string, number[]][],index:number):string => {
+    let response = '';
+    palindromes.forEach((p) => {
+       if(p[1][0] === index) {
+           response = p[0];
+       }
+    })
+    return response;
+ }
+  
+/**
+ *
+ *
+ * @param {string[]} arr
+ * @param {number} [index]
+ * @param {any[]} [trinitarianGroups]
+ * @return {*}  {any[]}
+ * @description Converts a word string into a trinitarian groups array.
+ * e.g: FormatTriniGroups("trinidad") => [
+    [
+        "t",
+        "r",
+        "ini",
+    ],
+    [
+        "dad",
+    ],
+    ]
+ */
+export const FormatTriniGroups = (
+    arr: string[],
+    index?: number,
+    trinitarianGroups?: any[]
+  ): any[] => {
+
+    const _trinitarianGroups: any[] = trinitarianGroups || [];
+    if (!index) index = 0;
+    // Segments Placeholder
+    let triniGroup = [];
+    // @deprecated assignation used before to convert the string into array
+    let _arr = arr;
+    const palindromes = findTrinitarianPalindromes(_arr.join(""));
+    
+    let localSegmentCounter = 0;
+    let positionCounter = 0+index;
+
+    while(localSegmentCounter<3) {
+        if(palindromeAtIndex(palindromes,positionCounter)) {
+            triniGroup.push(palindromeValueAtIndex(palindromes,positionCounter));
+            localSegmentCounter++;
+            positionCounter += 3;
+        } else if(_arr[positionCounter]) {
+            triniGroup.push(_arr[positionCounter]);
+            positionCounter ++;
+            localSegmentCounter++;
+        } else {
+            localSegmentCounter++;
+        }
     }
-  
-    trinitarianGroups.push({
-      suj: _arr[0] as unknown as string[],
-      eto: _arr[1] as unknown as string[],
-      obj: _arr[2] as unknown as string[],
-      word: _arr.join(""),
-      p_idx: index,
-      c_idx: 0,
-    });
-  
-    debug && console.log("TRINITARIAN GROUPS", trinitarianGroups);
-    return [FormatTriniGroup(arr, 0)];
+
+    _trinitarianGroups.push(triniGroup);
+
+    if(positionCounter<arr.length) {
+        return FormatTriniGroups(arr,positionCounter,_trinitarianGroups);
+    }
+
+    return _trinitarianGroups
+
   };
 
+  export const FormatTriniGroupsObject = (triniGroups:any[]):ITrinitarianGroup[] => {
+    return triniGroups.map(tri => {
+
+        const suj = tri[0];
+        const eto = tri[1];
+        const obj = tri[2];
+
+        const word = suj ? suj : ""  + eto ? eto : "" + obj ? obj : "";
+        const TriniatrianGroup:ITrinitarianGroup =
+        { 
+            ...suj && {suj: suj},
+            ...eto && {eto: eto},
+            ...obj && {obj: obj},
+            word: word,
+            p_idx: 0,
+            c_idx: 0
+        }
+
+        return TriniatrianGroup; 
+    })
+  }
 
   export default {
     FormatTriniGroup,
-    FormatTriniGroups
+    FormatTriniGroups,
+    FormatTriniGroupsObject
   }

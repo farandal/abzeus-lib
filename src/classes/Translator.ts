@@ -1,7 +1,7 @@
 
 import ABZeusDict from "../dict/ABZeusDict";
 import format, { format2 } from "../helpers/functions/format";
-import { FormatTriniGroups, FormatTriniGroup } from "../helpers/functions/formatTriniGroup";
+import { FormatTriniGroups, FormatTriniGroup, FormatTriniGroupsObject } from "../helpers/functions/formatTriniGroup";
 import { group } from "../helpers/functions/misc";
 import { splitIntoTrinitarianGroups } from "../helpers/functions/splitIntoTrinitarianGroups";
 import { parseNodeLinks, nodeTree } from "../helpers/node";
@@ -97,13 +97,13 @@ class Translator {
 
     forEachWord(phrase, (word: string, index: number) => {
         
-      const splittedWord = splitIntoTrinitarianGroups(word);
-      const trinitarianGroups = FormatTriniGroups(splittedWord, index)[0]; // TODO: this should not be 0.
+      //const splittedWord = splitIntoTrinitarianGroups(word);
+      const splittedWord = FormatTriniGroups(word.split(""), index);
+      console.log(splittedWord);
+      const trinitarianGroups = FormatTriniGroupsObject(FormatTriniGroups(word.split(""), index));
       
-    
+      console.log(trinitarianGroups);
 
-      
-      
       const detailedOutput = this.trinitarian(trinitarianGroups, _config);
       const simpleOutput = this.trinitarian(trinitarianGroups, {
         ..._config,
@@ -121,7 +121,7 @@ class Translator {
         charTranslatedWord: unicodeTranslatedCharacters, 
         splittedWord: splittedWord,
         detailedOutput: `(${word}).* ${detailedOutput}`,
-        simpleOutput: `(${word}).* ${simpleOutput}`,
+        simpleOutput: `${simpleOutput}`,
         triniTree: _config.processTree ? format2(FormatTriniGroups(splittedWord)) : null,
         nodeTree: _config.processTree ? parseNodeLinks(nodeTree(_config,trini(splittedWord))) : null,
       };
@@ -262,78 +262,89 @@ class Translator {
 
     _translate(trinitarianObject, i);
 
-    return `${d ? output + ` (${trinitarianString}).* ` : output}${
+    // TODO, add this to config object
+    const showTrinitarianString = false;
+
+    return `${d ? output + (showTrinitarianString? ` (${trinitarianString}).* ` : '') : output}${
       lineBreak ? "\n" : ""
     }`;
   }
 
-  public trinitarian(tri: IABZeusTrinitarianGroup, config: IABZeusTranslatorConfig) {
-    //console.log("trinitarian()",tri);
-
-    if(!config.lang) config.lang = "es";
-    const parentTriniFormat =
-      config.parentTriniFormat || DEFAULT_PARENT_TRINI_FORMAT;
-    const parentTriniFormatArray = Array.from(parentTriniFormat);
-    const childTriniFormat =
-      config.childTriniFormat || DEFAULT_CHILD_TRINI_FORMAT;
-    let output = "";
-    const dict = Dict.getInstance();
-    for (let i = 0; i < parentTriniFormatArray.length; i++) {
-      const positionFormat = parentTriniFormatArray[i];
-      if (positionFormat === "+" && tri.eto) {
-        //console.log("trieto",tri.eto)
-        //Do not print the first connector
-        //if (i > 0) {
-        output += dict.t("eto|" + parentTriniFormat, config.lang);
-        //} else {
-        //}
-        output += this.translateTrinitarian(
-          i,
-          tri.eto,
-          config.lang,
-          childTriniFormat,
-          config.inlineDetail,
-          config.lineBreak,
-          config.nestedTranslation
-        );
-      } else if (positionFormat === "<" && tri.suj) {
-        //console.log("trisuj",tri.suj)
-        //if (i > 1) {
-        //console.log(i,tri.suj, dict.t("suj|" + parentTriniFormat, config.lang));
-        output += dict.t("suj|" + parentTriniFormat, config.lang);
-        //} else {
-        //}
-        output += this.translateTrinitarian(
-          i,
-          tri.suj,
-          config.lang,
-          childTriniFormat,
-          config.inlineDetail,
-          config.lineBreak,
-          config.nestedTranslation
-        );
-      } else if (positionFormat === ">" && tri.obj) {
-        //console.log("triobj",tri.obj)
-        //if (i > 0) {
-        //console.log(i,tri.obj);
-        output += dict.t("obj|" + parentTriniFormat, config.lang);
-        //} else {}
-        output += this.translateTrinitarian(
-          i,
-          tri.obj,
-          config.lang,
-          childTriniFormat,
-          config.inlineDetail,
-          config.lineBreak,
-          config.nestedTranslation
-        );
-      }
+  public trinitarian(tri: IABZeusTrinitarianGroup[], config: IABZeusTranslatorConfig) {
   
-      output += ` `;
-    }
+    if(!config.lang) config.lang = "es";
     
-    return output;
+    const parentTriniFormat = config.parentTriniFormat || DEFAULT_PARENT_TRINI_FORMAT;
+    const parentTriniFormatArray = Array.from(parentTriniFormat);
+    const childTriniFormat = config.childTriniFormat || DEFAULT_CHILD_TRINI_FORMAT;
+    
+    let output = "";
+    
+    const dict = Dict.getInstance();
+    
+    tri.forEach((trinitarianGroup, index) => {
+        
+        for (let i = 0; i < parentTriniFormatArray.length; i++) {
+            const positionFormat = parentTriniFormatArray[i];
+            if (positionFormat === "+" && trinitarianGroup.eto) {
+              //console.log("trieto",tri.eto)
+              //Do not print the first connector
+              //if (i > 0) {
+              output += " "+dict.t("eto|" + parentTriniFormat, config.lang);
+              //} else {
+              //}
+              output += this.translateTrinitarian(
+                i,
+                trinitarianGroup.eto,
+                config.lang,
+                childTriniFormat,
+                config.inlineDetail,
+                config.lineBreak,
+                config.nestedTranslation
+              );
+
+            } else if (positionFormat === "<" && trinitarianGroup.suj) {
+              //console.log("trisuj",tri.suj)
+              //if (i > 1) {
+              //console.log(i,tri.suj, dict.t("suj|" + parentTriniFormat, config.lang));
+              output += " "+dict.t("suj|" + parentTriniFormat, config.lang);
+              //} else {
+              //}
+              output += this.translateTrinitarian(
+                i,
+                trinitarianGroup.suj,
+                config.lang,
+                childTriniFormat,
+                config.inlineDetail,
+                config.lineBreak,
+                config.nestedTranslation
+              );
+
+            } else if (positionFormat === ">" && trinitarianGroup.obj) {
+              //console.log("triobj",tri.obj)
+              //if (i > 0) {
+              //console.log(i,tri.obj);
+              output += " "+dict.t("obj|" + parentTriniFormat, config.lang);
+              //} else {}
+              output += this.translateTrinitarian(
+                i,
+                trinitarianGroup.obj,
+                config.lang,
+                childTriniFormat,
+                config.inlineDetail,
+                config.lineBreak,
+                config.nestedTranslation
+              );
+            }
+
+
+        }
+    });
+
+    return output.replace(/\s+/g, ' ');
+        
   }
+
 }
 
 export default Translator;

@@ -1,5 +1,5 @@
 interface IABZeusTranslatorConfig {
-    lang?: string;
+    lang: string;
     parentTriniFormat?: string;
     childTriniFormat?: string;
     inlineDetail?: boolean;

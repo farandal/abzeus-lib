@@ -1,7 +1,7 @@
 import ITrinitarianGroup from "./IABZeusTrinitarianGroup";
 
 interface IABZeusTranslatorOutput {
-    trinitarianGroups: ITrinitarianGroup;
+    trinitarianGroups: ITrinitarianGroup[];
     detailedOutput: string;
     simpleOutput: string;
     word: string;
